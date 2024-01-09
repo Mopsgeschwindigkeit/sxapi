@@ -25,6 +25,7 @@ class CliUser:
         self.api_access_token = None
         self.public_v2_api = None
         self.integration_v2_api = None
+        self.organisation_id = None
 
     @staticmethod
     def get_token_environment():
@@ -107,3 +108,5 @@ class CliUser:
                 base_url=config_dict["api_integration_v2_path"],
                 api_token=self.api_access_token,
             )
+
+        self.organisation_id = config_dict["orga"]
