@@ -10,6 +10,7 @@ from os.path import (
 from setuptools import setup
 
 from sxapi.cli import cli_user
+from sxapi.cli.subparser.animals import create_animals_parser
 from sxapi.cli.subparser.token import create_token_parser
 
 
@@ -149,6 +150,7 @@ class Cli:
         subparsers = main_parser.add_subparsers(title="sub_commands")
         # create_gsd_parser(subparsers)
         create_token_parser(subparsers)
+        create_animals_parser(subparsers)
 
         if not args:
             main_parser.print_help()
