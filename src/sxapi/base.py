@@ -72,7 +72,6 @@ class BaseAPI(object):
     def get(self, path, *args, **kwargs):
         url = self.to_url(path)
         r = self.session.get(url, *args, **kwargs)
-        print(r)
         return r.json()
 
     def post(self, path, *args, **kwargs):
