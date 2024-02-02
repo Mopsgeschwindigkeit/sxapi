@@ -1,3 +1,5 @@
+import json
+
 from sxapi.cli import cli_user
 
 
@@ -76,14 +78,11 @@ def animals_sub_function(args):
         if args.limit > 0:
             animals = animals[: args.limit]
 
-        print(animals)
+        print(json.dumps(animals))
         return 0
 
     if args.ids:
-        result = cli_user.public_v2_api.animals.get_by_ids(args.ids)
-        if result["status"] and result["status"] != 200:
-            print(result["message"])
-            return 1
+        animals = animals + cli_user.public_v2_api.animals.get_by_ids(args.ids)
 
     if args.official_ids:
         for official_id in args.official_ids:
@@ -93,5 +92,5 @@ def animals_sub_function(args):
                 )
             )
 
-    print(animals)
+    print(json.dumps(animals))
     return 0
