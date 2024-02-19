@@ -24,7 +24,7 @@ def create_animals_parser(subparsers):
     animals_parser.add_argument(
         "-o",
         "--organisation_id",
-        nargs=1,
+        nargs="?",
         default=None,
         help="Id of the organisation to retrieve animals from",
         metavar="ORGANISATION_ID",
@@ -32,7 +32,7 @@ def create_animals_parser(subparsers):
     animals_parser.add_argument(
         "--all",
         action="store_true",
-        help="Retrieve all animals from the organisation",
+        help="Retrieve all animals from the orga.(disables --ids,--official-ids)",
     )
     animals_parser.add_argument(
         "--limit",
