@@ -21,7 +21,7 @@ class CliUser:
 
         calls self._init_creds() to set available credentials on startup.
         """
-
+        self.organisation_id = None
         self.api_access_token = None
         self.public_v2_api = None
         self.integration_v2_api = None
@@ -64,7 +64,7 @@ class CliUser:
             return True
         return False
 
-    def init_user(self, config, args_token, args_keyring):
+    def init_user(self, config, args_token, args_keyring, args_orga_id):
         """
         This function retrieves the token from the specified resource
         (keyring, environment or args) and initializes clients
@@ -76,6 +76,11 @@ class CliUser:
         If username and password are also missing, no credentials get
         stored and not API clients are created.
         """
+        if args_orga_id:
+            self.organisation_id = args_orga_id
+        elif config.orga:
+            self.organisation_id = config.orga
+
         if args_token:
             self.api_access_token = args_token
         elif args_keyring:

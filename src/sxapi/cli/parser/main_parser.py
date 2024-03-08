@@ -4,7 +4,10 @@ from setuptools import setup
 
 from sxapi.cli import cli_user
 from sxapi.cli.configuration import Config
-from sxapi.cli.parser.subparser import SxApiTokenSubparser
+from sxapi.cli.parser.subparser import (
+    SxApiAnimalsSubparser,
+    SxApiTokenSubparser,
+)
 
 
 def version_info():
@@ -86,10 +89,18 @@ class SxApiMainParser:
             action="store_true",
             help="Print example config file and exits",
         )
+        self._parser.add_argument(
+            "-o",
+            "--organisation_id",
+            type=str,
+            default=None,
+            help="ID of working organisation",
+        )
 
     def _add_subparser(self):
         # Initiate other subparsers here
         SxApiTokenSubparser.register_as_subparser(self._subparsers)
+        SxApiAnimalsSubparser.register_as_subparser(self._subparsers)
 
     def parse_args(self, args):
         if len(args) == 0:
@@ -109,7 +120,9 @@ class SxApiMainParser:
         if args.configfile:
             self.config = Config(args.configfile)
 
-        cli_user.init_user(self.config, args.access_token, args.use_keyring)
+        cli_user.init_user(
+            self.config, args.access_token, args.use_keyring, args.organisation_id
+        )
 
         if args.status:
             api_status()

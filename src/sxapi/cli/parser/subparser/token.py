@@ -182,5 +182,6 @@ class SxApiTokenSubparser:
                 return handle_new_token()
 
             self._parser.print_help()
+            return 2
 
         self._parser.set_defaults(func=token_sub_function)
