@@ -1,14 +1,15 @@
 import mock
+from requests import HTTPError
 
-from sxapi.cli.cli import Cli
-from sxapi.cli.subparser.token import (
-    handle_clear_token,
-    handle_new_token,
-    handle_print_token,
-    handle_set_token,
-)
+from sxapi.cli.parser import main_parser
 
-args_parser = Cli.parse_args
+test_parser = main_parser.SxApiMainParser(True)
+args_parser = test_parser.parse_args
+
+
+class MockHTTPError(HTTPError):
+    def __str__(self):
+        return "401"
 
 
 @mock.patch("builtins.print")
@@ -16,7 +17,6 @@ args_parser = Cli.parse_args
 def test_handle_print_token(_, print_mock):
     namespace = args_parser(["token", "-p"])
     assert namespace.print_token == "ek"
-    handle_print_token(namespace)
     assert print_mock.call_count == 1
     call_args = print_mock.call_args_list[0]
     assert call_args.args[0] == "\nKeyring: None\n\nEnvironment: None"
@@ -24,7 +24,6 @@ def test_handle_print_token(_, print_mock):
 
     namespace = args_parser(["token", "-p", "ek"])
     assert namespace.print_token == "ek"
-    handle_print_token(namespace)
     assert print_mock.call_count == 1
     call_args = print_mock.call_args_list[0]
     assert call_args.args[0] == "\nKeyring: None\n\nEnvironment: None"
@@ -32,7 +31,6 @@ def test_handle_print_token(_, print_mock):
 
     namespace = args_parser(["token", "-p", "k"])
     assert namespace.print_token == "k"
-    handle_print_token(namespace)
     call_args = print_mock.call_args_list[0]
     assert print_mock.call_count == 1
     assert call_args.args[0] == "\nKeyring Token: None\n"
@@ -40,7 +38,6 @@ def test_handle_print_token(_, print_mock):
 
     namespace = args_parser(["token", "-p", "e"])
     assert namespace.print_token == "e"
-    handle_print_token(namespace)
     call_args = print_mock.call_args_list[0]
     assert print_mock.call_count == 1
     assert call_args.args[0] == "\nEnvironment Token: None\n"
@@ -48,7 +45,6 @@ def test_handle_print_token(_, print_mock):
 
     namespace = args_parser(["token", "-p", "a"])
     assert namespace.print_token == "a"
-    handle_print_token(namespace)
     call_args = print_mock.call_args_list[0]
     assert print_mock.call_count == 1
     assert (
@@ -59,7 +55,6 @@ def test_handle_print_token(_, print_mock):
 
     namespace = args_parser(["token", "-p", "notvalid"])
     assert namespace.print_token == "notvalid"
-    handle_print_token(namespace)
     call_args = print_mock.call_args_list[0]
     assert print_mock.call_count == 1
     assert (
@@ -71,10 +66,10 @@ def test_handle_print_token(_, print_mock):
 
 @mock.patch("builtins.print")
 @mock.patch("sxapi.cli.cli_user.set_token_keyring", return_value="api_token")
-def test_handle_set_token(cred_mock, print_mock):
+@mock.patch("sxapi.publicV2.PublicAPIV2.get_token")
+def test_handle_set_token(get_mock, cred_mock, print_mock):
     namespace = args_parser(["token", "-s", "api_token"])
     assert namespace.set_keyring == ["api_token"]
-    handle_set_token(namespace)
     call_args = print_mock.call_args_list[0]
     assert print_mock.call_count == 1
     assert call_args.args[0] == "Token is stored in keyring!"
@@ -84,10 +79,10 @@ def test_handle_set_token(cred_mock, print_mock):
 
 @mock.patch("builtins.print")
 @mock.patch("sxapi.cli.cli_user.clear_token_keyring", return_value="api_token")
-def test_handle_clear_token(_, print_mock):
+@mock.patch("sxapi.publicV2.PublicAPIV2.get_token")
+def test_handle_clear_token(get_mock, user_mock, print_mock):
     namespace = args_parser(["token", "-c"])
     assert namespace.clear_keyring is True
-    handle_clear_token()
     call_args = print_mock.call_args_list[0]
     assert print_mock.call_count == 1
     assert call_args.args[0] == "Token was deleted from keyring!"
@@ -95,25 +90,27 @@ def test_handle_clear_token(_, print_mock):
 
 
 @mock.patch("builtins.print")
-@mock.patch("sxapi.cli.subparser.token.getpass.getpass", return_value=None)
-@mock.patch("sxapi.cli.cli_user")
-def test_handle_new_token(_, getpass_mock, print_mock):
+@mock.patch("sxapi.cli.parser.subparser.token.getpass.getpass", return_value=None)
+@mock.patch("sxapi.cli.parser.main_parser.cli_user")
+@mock.patch(
+    "sxapi.cli.parser.subparser.token.PublicAPIV2.get_token",
+    side_effect=MockHTTPError(),
+)
+def test_handle_new_token(a, user_mock, getpass_mock, print_mock):
     print_mock.reset_mock()
 
-    namespace = args_parser(["token", "-n"])
-    assert namespace.new_token is True
     with mock.patch("builtins.input", lambda _: "marco_no_at_test"):
-        handle_new_token(namespace)
+        namespace = args_parser(["token", "-n"])
+        assert namespace.new_token is True
         assert getpass_mock.call_count == 0
         call_args = print_mock.call_args_list[0]
         assert print_mock.call_count == 1
         assert call_args.args[0] == "Username must be a email!"
         print_mock.reset_mock()
 
-    namespace = args_parser(["token", "-n"])
-    assert namespace.new_token is True
     with mock.patch("builtins.input", lambda _: "marco@test"):
-        handle_new_token(namespace)
+        namespace = args_parser(["token", "-n"])
+        assert namespace.new_token is True
         assert getpass_mock.call_count == 1
         call_args = print_mock.call_args_list[0]
         assert print_mock.call_count == 1
@@ -121,10 +118,9 @@ def test_handle_new_token(_, getpass_mock, print_mock):
         print_mock.reset_mock()
 
     with mock.patch("sxapi.publicV2.PublicAPIV2.get_token", return_value="api_token"):
-        namespace = args_parser(["token", "-n"])
-        assert namespace.new_token is True
         with mock.patch("builtins.input", lambda _: "marco@test"):
-            handle_new_token(namespace)
+            namespace = args_parser(["token", "-n"])
+            assert namespace.new_token is True
             assert getpass_mock.call_count == 2
             call_args = print_mock.call_args_list[0]
             assert print_mock.call_count == 1
@@ -133,10 +129,10 @@ def test_handle_new_token(_, getpass_mock, print_mock):
 
 
 @mock.patch("builtins.print")
-def test_token_subfunc(print_mock):
-    namespace = args_parser(["token", "-c", "-s", "api_token"])
+@mock.patch("sxapi.publicV2.PublicAPIV2.get_token", return_value="api_token")
+def test_token_sub_func(_, print_mock):
+    args_parser(["token", "-c", "-s", "api_token"])
 
-    namespace.func(namespace)
     call_args = print_mock.call_args_list[0]
     assert print_mock.call_count == 1
     assert (
