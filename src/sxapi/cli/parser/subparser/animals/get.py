@@ -86,9 +86,9 @@ class SxApiAnimalsGetSubparser:
             animals = []
 
             if args.ids:
-                # get animals by official id
                 if args.official_ids:
                     for official_id in args.ids:
+                        # there is no endpoint to get a list of animals by official id
                         animal = cli_user.public_v2_api.animals.get_by_official_id(
                             organisation_id, official_id
                         )
