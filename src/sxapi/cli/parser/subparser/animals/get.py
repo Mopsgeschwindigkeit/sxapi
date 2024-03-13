@@ -34,12 +34,17 @@ class SxApiAnimalsGetSubparser:
             "--ids",
             nargs="+",
             help="ID's of the animals to retrieve",
-            metavar="ANIMAL_IDS",
+            metavar="OBJECT_IDS",
         )
         self._parser.add_argument(
             "--official-ids",
             action="store_true",
-            help="The given ANIMAL_IDS are official_ids instead of internal_ids",
+            help="The given OBJECT_IDS are animals official_ids instead of internal_ids",
+        )
+        self._parser.add_argument(
+            "--aborts",
+            action="store_true",
+            help="Include aborted animals. default = False.",
         )
         self._parser.add_argument(
             "-o",
