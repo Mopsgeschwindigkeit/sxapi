@@ -6,6 +6,8 @@ from sxapi.cli.parser.main_parser import SxApiMainParser
 from sxapi.errors import (
     SxapiAuthorizationError,
     SxapiConfigurationFileError,
+    SxapiFileNotFoundError,
+    SxapiInvalidJsonError,
     SxapiUnprocessableContentError,
 )
 
@@ -24,6 +26,12 @@ def handle_cli_return_values(func):
         except SxapiConfigurationFileError as e:
             error_msg = e
             exit_code = 3
+        except SxapiInvalidJsonError as e:
+            error_msg = e
+            exit_code = 4
+        except SxapiFileNotFoundError as e:
+            error_msg = e
+            exit_code = 5
         except HTTPError as e:
             error_msg = e
             exit_code = 98

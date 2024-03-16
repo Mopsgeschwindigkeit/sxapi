@@ -1,13 +1,16 @@
+import argparse
 import json
 import sys
 
-import argparse
-
 from sxapi.cli import cli_user
+from sxapi.errors import (
+    SxapiFileNotFoundError,
+    SxapiInvalidJsonError,
+)
 
 DESCRIPTION = """
     Create animals for the given organisation.
-    
+
     Basic Example:
     {
         "mark": "123456",
@@ -16,7 +19,7 @@ DESCRIPTION = """
         "birthday": "2018-01-01",
         "name": "Bella",
     }
-    
+
     All available fields can be found here: https://api.smaxtec.com/api/v2/animals
 """
 
@@ -54,7 +57,7 @@ class SxApiAnimalsCreateSubparser:
             nargs="?",
             type=argparse.FileType("r"),
             default=sys.stdin,
-            help="Animal Json file",
+            help="Path to json file containing animal data. (default: stdin)",
             metavar="ANIMAL_JSON_FILE",
         )
         self._parser.add_argument(
@@ -70,14 +73,28 @@ class SxApiAnimalsCreateSubparser:
 
     def _set_default_func(self):
         def animals_sub_function(args):
-            if args.animal_json.isatty():
-                print("No animal json file provided")
+            if not cli_user.check_credentials_set():
+                print("No credentials set!")
                 return 1
+
+            organisation_id = cli_user.organisation_id
+
+            if args.organisation_id:
+                organisation_id = args.organisation_id
+
+            if organisation_id is None:
+                print("No organisation_id set!")
+                return 1
+
+            if args.animal_json.isatty():
+                raise SxapiFileNotFoundError()
             try:
                 animal_json = json.load(args.animal_json)
+
+                cli_user.public_v2_api.animals.post(organisation_id, **animal_json)
+
             except json.JSONDecodeError:
-                print("Invalid JSON file")
-                return 1
+                raise SxapiInvalidJsonError()
 
             print(animal_json)
 

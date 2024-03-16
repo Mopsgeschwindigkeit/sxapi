@@ -2,6 +2,12 @@ import json
 
 from sxapi.cli import cli_user
 
+DESCRIPTION = """
+    Get animals from the smaXtec system.
+
+    If no optional flags are set, get all animals from the specified organisation.
+"""
+
 
 class SxApiAnimalsGetSubparser:
     @classmethod
@@ -13,7 +19,7 @@ class SxApiAnimalsGetSubparser:
             "get",
             help="Get animals",
             usage="sxapi [base_options] animals get [options]",
-            description="Get animals from the smaXtec system.",
+            description=DESCRIPTION,
         )
 
         self._add_arguments()
@@ -34,17 +40,13 @@ class SxApiAnimalsGetSubparser:
             "--ids",
             nargs="+",
             help="ID's of the animals to retrieve",
-            metavar="OBJECT_IDS",
+            metavar="ANIMAL_IDS",
         )
         self._parser.add_argument(
             "--official-ids",
             action="store_true",
-            help="The given OBJECT_IDS are animals official_ids instead of internal_ids",
-        )
-        self._parser.add_argument(
-            "--aborts",
-            action="store_true",
-            help="Include aborted animals. default = False.",
+            help="The given ANIMAL_IDS are animals official_ids\
+             instead of internal_ids",
         )
         self._parser.add_argument(
             "-o",

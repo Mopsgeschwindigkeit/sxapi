@@ -37,3 +37,29 @@ class SxapiConfigurationFileError(Exception):
 
     def __str__(self):
         return self.info + " -> " + self.parent_name + " -> " + self.message
+
+
+class SxapiInvalidJsonError(Exception):
+    """Raised when JSON object is not valid."""
+
+    AUTHORIZATION_ERROR_MSG = """
+    Object is not a valid JSON object."""
+
+    def __init__(self, message=AUTHORIZATION_ERROR_MSG):
+        self.message = message
+
+    def __str__(self):
+        return self.message
+
+
+class SxapiFileNotFoundError(Exception):
+    """Raised when the path is not valid or the file does not exist."""
+
+    AUTHORIZATION_ERROR_MSG = """
+    Given Path is not correct or file does not exist."""
+
+    def __init__(self, message=AUTHORIZATION_ERROR_MSG):
+        self.message = message
+
+    def __str__(self):
+        return self.message
