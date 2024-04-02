@@ -6,7 +6,7 @@ from sxapi.cli import (
     cli_user,
     configuration,
 )
-from sxapi.cli.cli import Cli
+from tests import CliTest
 
 obj = mock.MagicMock
 
@@ -18,10 +18,10 @@ ConfigTest = configuration.Config
 @mock.patch("sxapi.cli.cli_user.get_token_keyring", return_value="keyring-token")
 @mock.patch("sxapi.publicV2.PublicAPIV2.get_token", return_value="keyring-token")
 def test_func(get_token_mock, keyring_mock, print_mock, version_mock):
-    cli = Cli()
+    cli = CliTest()
     with mock.patch("sys.argv", ["sxapi", "--version"]):
         assert version_mock.call_count == 0
-        Cli().run()
+        CliTest().run()
         assert version_mock.call_count == 1
     print_mock.reset_mock()
 
@@ -47,7 +47,7 @@ def test_func(get_token_mock, keyring_mock, print_mock, version_mock):
 @mock.patch("sxapi.cli.cli_user.get_token_keyring", return_value="keyring-token")
 def test_config(keyring_mock, version_mock):
     # test config file default
-    cli = Cli()
+    cli = CliTest()
     ConfigTest._config_file_paths = ["./tests/cli_tests/test-config.conf"]
     cli.sx_main_parser.config = ConfigTest()
     with mock.patch("sys.argv", ["sxapi", "--version"]):
@@ -58,8 +58,8 @@ def test_config(keyring_mock, version_mock):
             assert res.user == "test@example.com"
             assert res.password == "smaxtec_test_user_pwd"
             assert res.orga == "smaxtec_test_organisation_id"
-            assert res.api_public_v2_path == "https://test_path_test/users/credentials"
-            assert res.api_integration_v2_path == "test_path_integration"
+            assert res.api_public_v2_path == "https://test_path_test"
+            assert res.api_integration_v2_path == "https://test_path_integration"
 
     # test config_file_path override
     with mock.patch(
@@ -96,7 +96,7 @@ def test_config(keyring_mock, version_mock):
 @mock.patch("sxapi.cli.cli_user.get_token_keyring", return_value="keyring-token")
 @mock.patch("sxapi.publicV2.PublicAPIV2.get_token", return_value="api-token")
 def test_init_user(api_mock, k_mock, version_mock):
-    cli = Cli()
+    cli = CliTest()
     with mock.patch(
         "sys.argv",
         ["sxapi", "--version", "-c", "test-config_param.conf", "-t", "atoken"],
