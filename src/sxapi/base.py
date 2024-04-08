@@ -58,7 +58,7 @@ class BaseAPI(object):
     @property
     def session(self):
         """
-        Geneates a new HTTP session on the fly and logs in if no session exists.
+        Generates a new HTTP session on the fly and logs in if no session exists.
         """
         if self._session is None:
             self._session = requests.Session()

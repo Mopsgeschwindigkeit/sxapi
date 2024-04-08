@@ -94,13 +94,17 @@ class SxApiAnimalsGetSubparser:
 
             if args.ids:
                 if args.official_ids:
+                    # there is no endpoint to get a list of animals by official id
                     for official_id in args.ids:
-                        # there is no endpoint to get a list of animals by official id
                         animal = cli_user.public_v2_api.animals.get_by_official_id(
                             organisation_id, official_id
                         )
 
-                        if animal["archived"] and args.archived:
+                        if (
+                            not animal["archived"]
+                            or animal["archived"]
+                            and args.archived
+                        ):
                             animals.append(animal)
                 else:
                     for animal in cli_user.public_v2_api.animals.get_by_ids(args.ids):

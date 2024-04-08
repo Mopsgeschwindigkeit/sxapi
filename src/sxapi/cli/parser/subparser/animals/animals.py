@@ -1,5 +1,6 @@
-from sxapi.cli.parser.subparser.animals.get import SxApiAnimalsGetSubparser
 from sxapi.cli.parser.subparser.animals.create import SxApiAnimalsCreateSubparser
+from sxapi.cli.parser.subparser.animals.get import SxApiAnimalsGetSubparser
+from sxapi.cli.parser.subparser.animals.update import SxApiAnimalsUpdateSubparser
 
 
 class SxApiAnimalsSubparser:
@@ -33,6 +34,7 @@ class SxApiAnimalsSubparser:
     def _add_subparser(self):
         SxApiAnimalsGetSubparser.register_as_subparser(self._subparsers)
         SxApiAnimalsCreateSubparser.register_as_subparser(self._subparsers)
+        SxApiAnimalsUpdateSubparser.register_as_subparser(self._subparsers)
 
     def _set_default_func(self):
 

@@ -9,31 +9,41 @@ from sxapi.errors import (
 )
 
 DESCRIPTION = """
-    Create animals for the given organisation.
+    Update an animal for the given organisation.
+
+    Provide an dict containing the fields to update.
+    1. The animal_id must be contained in the update dict.
+    2. If you want to move the animal to another organisation,
+        the mark needs to be unique in the new organisation.
 
     Basic Example:
     {
+        "animal_id": "123456", # REQUIRED
+        ...
+        "organisation_id": "1234bdc234d
         "mark": "123456",
-        "organisation_id": "123456",
-        "official_id": "123456",
+        "official_id": "AT000123456",
+        "official_id_rule": "AT",
         "birthday": "2018-01-01",
         "name": "Bella",
+        ...
     }
 
-    All available fields can be found here: https://api.smaxtec.com/api/v2/animals
+    All available fields can be found here:
+    POST https://api.smaxtec.com/api/v2/animals/{animal_id}
 """
 
 
-class SxApiAnimalsCreateSubparser:
+class SxApiAnimalsUpdateSubparser:
     @classmethod
     def register_as_subparser(cls, parent_subparser):
         return cls(parent_subparser)
 
     def __init__(self, parent_subparser, subparsers=False):
         self._parser = parent_subparser.add_parser(
-            "create",
-            help="create animals",
-            usage="sxapi [base_options] animals create [options] ANIMAL_JSON_FILE",
+            "update",
+            help="Update animal",
+            usage="sxapi [base_options] animals update [options]",
             formatter_class=argparse.RawDescriptionHelpFormatter,
             description=DESCRIPTION,
         )
@@ -53,14 +63,15 @@ class SxApiAnimalsCreateSubparser:
 
     def _add_arguments(self):
         self._parser.add_argument(
-            "animal_json",
+            "update_dict",
             nargs="?",
             type=argparse.FileType("r"),
             default=sys.stdin,
-            help="Path to json file containing animal data. (default: stdin)",
-            metavar="ANIMAL_JSON_FILE",
+            help="Path to file containing animal update dict. (default: stdin)",
+            metavar="ANIMAL_UPDATE_DICT",
         )
         self._parser.add_argument(
+            "-o",
             "--organisation_id",
             nargs="?",
             type=str,
@@ -86,15 +97,14 @@ class SxApiAnimalsCreateSubparser:
                 print("No organisation_id set!")
                 return 1
 
-            if args.animal_json.isatty():
+            if args.update_dict.isatty():
                 raise SxapiFileNotFoundError()
 
             try:
-                animal_json = json.load(args.animal_json)
-
-                res = cli_user.public_v2_api.animals.post(
-                    organisation_id, **animal_json
-                )
+                update_dict = json.load(args.update_dict)
+                animal_id = update_dict.pop("animal_id", None)
+                print(update_dict)
+                res = cli_user.public_v2_api.animals.put(animal_id, **update_dict)
 
             except json.JSONDecodeError:
                 raise SxapiInvalidJsonError()
