@@ -1,3 +1,5 @@
+import json
+
 import mock
 
 from tests import (
@@ -15,7 +17,6 @@ test_cli_user = CliUserTest()
 @mock.patch("sxapi.cli.parser.main_parser.cli_user", test_cli_user)
 @mock.patch("sxapi.cli.parser.subparser.animals.get.cli_user", test_cli_user)
 def test_cli_animals_get(print_mock):
-
     # test output for all animals and organisation_id
     test_cli_user.integration_v2_api.mock_get_return_value(
         ResponseMock([{"all": "animals"}], 200)
@@ -105,3 +106,53 @@ def test_cli_animals_get(print_mock):
 
     # check if output was correctly printed to stdout
     assert print_mock.call_args[0][0] == '[{"animal_id": "2", "archived": false}]'
+    test_cli_user.public_v2_api.reset_mock()
+
+
+@mock.patch("builtins.print")
+@mock.patch("sxapi.cli.parser.main_parser.cli_user", test_cli_user)
+@mock.patch("sxapi.cli.parser.subparser.animals.create.cli_user", test_cli_user)
+def test_cli_animals_create(print_mock):
+    test_cli_user.public_v2_api.mock_post_return_value(
+        ResponseMock(
+            {
+                "_id": "1",
+                "archived": True,
+                "mark": "test_mark",
+                "name": "test_name",
+                "lifecycle": {},
+            },
+            200,
+        )
+    )
+
+    namespace = args_parser(
+        ["animals", "create", "./tests/cli_tests/animal_test_json.json"]
+    )
+    assert namespace.animals_sub_commands == "create"
+    assert namespace.organisation_id is None
+    assert namespace.animal_json.name == "./tests/cli_tests/animal_test_json.json"
+
+    assert len(test_cli_user.public_v2_api.post_called_with) == 1
+
+    # if the organisation_id is set in the json file, it should be ignored
+    comp_dict = json.load(open("./tests/cli_tests/animal_test_json.json"))
+    comp_dict["organisation_id"] = test_cli_user.organisation_id
+    assert test_cli_user.public_v2_api.post_called_with[0] == {
+        "kwargs": {"json": comp_dict},
+        "path": "/animals",
+    }
+
+    assert (
+        print_mock.call_args_list[0][0][0]
+        == "Ignoring organisation_id from json file, use from organisation_id from config."
+    )
+
+    comp_dict = {
+        "_id": "1",
+        "archived": True,
+        "mark": "test_mark",
+        "name": "test_name",
+        "lifecycle": {},
+    }
+    assert print_mock.call_args_list[1][0][0] == comp_dict

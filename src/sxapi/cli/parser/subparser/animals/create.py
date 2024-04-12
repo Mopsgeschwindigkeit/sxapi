@@ -92,6 +92,15 @@ class SxApiAnimalsCreateSubparser:
             try:
                 animal_json = json.load(args.animal_json)
 
+                # if organisation_id is defined in the json file, remove it
+                if animal_json["organisation_id"]:
+                    print(
+                        "Ignoring organisation_id from json file,"
+                        " use from organisation_id from config."
+                    )
+                    del animal_json["organisation_id"]
+
+                # always use the organisation_id from the cli_user
                 res = cli_user.public_v2_api.animals.post(
                     organisation_id, **animal_json
                 )
