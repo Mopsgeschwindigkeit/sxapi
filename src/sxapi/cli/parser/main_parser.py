@@ -89,6 +89,13 @@ class SxApiMainParser:
             action="store_true",
             help="Print example config file and exits",
         )
+        self._parser.add_argument(
+            "--organisation_id",
+            nargs="?",
+            type=str,
+            help="ID of the organisation to retrieve animals from",
+            metavar="ORGANISATION_ID",
+        )
 
     def _add_subparser(self):
         # Initiate other subparsers here
