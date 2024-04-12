@@ -102,8 +102,15 @@ class SxApiAnimalsUpdateSubparser:
 
             try:
                 update_dict = json.load(args.update_dict)
+
+                if update_dict["organisation_id"]:
+                    print(
+                        "Ignoring organisation_id from json file,"
+                        " use from organisation_id from config."
+                    )
+                    update_dict["organisation_id"] = organisation_id
+
                 animal_id = update_dict.pop("animal_id", None)
-                print(update_dict)
                 res = cli_user.public_v2_api.animals.put(animal_id, **update_dict)
 
             except json.JSONDecodeError:

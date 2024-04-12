@@ -156,3 +156,53 @@ def test_cli_animals_create(print_mock):
         "lifecycle": {},
     }
     assert print_mock.call_args_list[1][0][0] == comp_dict
+
+
+@mock.patch("builtins.print")
+@mock.patch("sxapi.cli.parser.main_parser.cli_user", test_cli_user)
+@mock.patch("sxapi.cli.parser.subparser.animals.update.cli_user", test_cli_user)
+def test_cli_animals_update(print_mock):
+    test_cli_user.public_v2_api.mock_put_return_value(
+        ResponseMock(
+            {
+                "_id": "1",
+                "archived": True,
+                "mark": "test_mark",
+                "name": "test_name",
+                "lifecycle": {},
+            },
+            200,
+        )
+    )
+
+    namespace = args_parser(
+        ["animals", "update", "./tests/cli_tests/animal_test_json.json"]
+    )
+    assert namespace.animals_sub_commands == "update"
+    assert namespace.organisation_id is None
+    assert namespace.update_dict.name == "./tests/cli_tests/animal_test_json.json"
+
+    assert len(test_cli_user.public_v2_api.put_called_with) == 1
+
+    # if the organisation_id is set in the json file, it should be ignored
+    comp_dict = json.load(open("./tests/cli_tests/animal_test_json.json"))
+    comp_dict["organisation_id"] = test_cli_user.organisation_id
+    a = comp_dict.pop("animal_id")
+    assert test_cli_user.public_v2_api.put_called_with[0] == {
+        "kwargs": {"json": comp_dict},
+        "path": f"/animals/{a}",
+    }
+
+    assert (
+        print_mock.call_args_list[0][0][0]
+        == "Ignoring organisation_id from json file, use from organisation_id from config."
+    )
+
+    comp_dict = {
+        "_id": "1",
+        "archived": True,
+        "mark": "test_mark",
+        "name": "test_name",
+        "lifecycle": {},
+    }
+    assert print_mock.call_args_list[1][0][0] == comp_dict
