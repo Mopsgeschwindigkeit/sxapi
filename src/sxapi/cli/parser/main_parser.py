@@ -89,13 +89,6 @@ class SxApiMainParser:
             action="store_true",
             help="Print example config file and exits",
         )
-        self._parser.add_argument(
-            "-o",
-            "--organisation_id",
-            type=str,
-            default=None,
-            help="ID of working organisation",
-        )
 
     def _add_subparser(self):
         # Initiate other subparsers here
