@@ -5,6 +5,7 @@ from setuptools import setup
 from sxapi.cli import cli_user
 from sxapi.cli.configuration import Config
 from sxapi.cli.parser.subparser import (
+    SxApiAbortsSubparser,
     SxApiAnimalsSubparser,
     SxApiTokenSubparser,
 )
@@ -101,6 +102,7 @@ class SxApiMainParser:
         # Initiate other subparsers here
         SxApiTokenSubparser.register_as_subparser(self._subparsers)
         SxApiAnimalsSubparser.register_as_subparser(self._subparsers)
+        SxApiAbortsSubparser.register_as_subparser(self._subparsers)
 
     def parse_args(self, args):
         if len(args) == 0:
