@@ -6,6 +6,8 @@ DESCRIPTION = """
     Get animals from the smaXtec system.
 
     If no optional flags are set, get all animals from the specified organisation.
+
+    If the call was successful the whole animal is returned.
 """
 
 

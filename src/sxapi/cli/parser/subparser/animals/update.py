@@ -31,6 +31,8 @@ DESCRIPTION = """
 
     All available fields can be found here:
     POST https://api.smaxtec.com/api/v2/animals/{animal_id}
+
+    If the call was successful the whole animal is returned.
 """
 
 

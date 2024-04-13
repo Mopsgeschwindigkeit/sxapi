@@ -21,6 +21,8 @@ DESCRIPTION = """
     }
 
     All available fields can be found here: https://api.smaxtec.com/api/v2/animals
+
+    If the call was successful the whole animal is returned.
 """
 
 

@@ -12,7 +12,7 @@ class SxApiAnimalsSubparser:
         self._parser = parent_subparser.add_parser(
             "animals",
             help="Working on animals",
-            usage="sxapi [base_options] animals [options]",
+            usage="sxapi [base_options] animals [animals_sub_commands]",
         )
 
         self._add_arguments()
