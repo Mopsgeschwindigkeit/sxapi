@@ -1,0 +1,37 @@
+sxapi.cli.parser.subparser.aborts package
+=========================================
+
+Submodules
+----------
+
+sxapi.cli.parser.subparser.aborts.create module
+-----------------------------------------------
+
+.. automodule:: sxapi.cli.parser.subparser.aborts.create
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+sxapi.cli.parser.subparser.aborts.delete module
+-----------------------------------------------
+
+.. automodule:: sxapi.cli.parser.subparser.aborts.delete
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+sxapi.cli.parser.subparser.aborts.update module
+-----------------------------------------------
+
+.. automodule:: sxapi.cli.parser.subparser.aborts.update
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: sxapi.cli.parser.subparser.aborts
+   :members:
+   :undoc-members:
+   :show-inheritance:
