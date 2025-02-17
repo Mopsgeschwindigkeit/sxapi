@@ -16,6 +16,8 @@
 =====
 sxapi
 =====
+.. image:: https://raw.githubusercontent.com/smaxtec/sxapi/master/img/sx_api_logo_450.png
+    :alt: SX API logo
 
 
     a new API to interact with the smaXtec system.
