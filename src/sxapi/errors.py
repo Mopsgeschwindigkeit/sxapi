@@ -1,15 +1,43 @@
+class SxapiCliArgumentError(Exception):
+    """Raised when arguments are valid for argparse
+    but make no sense semantically."""
+
+    ARGUMENT_ERROR_MSG = """
+    Invalid arguments provided. Please check the help for the correct usage."""
+
+    def __init__(self, message=ARGUMENT_ERROR_MSG):
+        self.message = message
+
+    def __str__(self):
+        return f"{self.__class__.__name__}:  {self.message}"
+
+
 class SxapiAuthorizationError(Exception):
-    """Raised when authorization fails 401."""
+    """Raised when authorization fails 401, 403."""
 
     AUTHORIZATION_ERROR_MSG = """
-    Requested object could not be accessed.
-    Maybe the organisation_id or the _id of the requested object is wrong."""
+    Authorization failed: Access to the requested resource is denied.
+    Please check your if your credentials are set and ensure you have the necessary permissions."""
 
     def __init__(self, message=AUTHORIZATION_ERROR_MSG):
         self.message = message
 
     def __str__(self):
-        return self.message
+        return f"{self.__class__.__name__}:  {self.message}"
+
+
+class SxapiMissingOrgaIDError(Exception):
+    """Raised when no organisation_id can be found"""
+
+    ORGANISATION_ID_ERROR_MSG = """
+        No organisation_id was set.
+        Provide you organisation_id as env var, as cli parameter or inside the config File"""
+
+    def __init__(self, message=ORGANISATION_ID_ERROR_MSG):
+        self.message = message
+
+    def __str__(self):
+        return f"{self.__class__.__name__}:  {self.message}"
 
 
 class SxapiUnprocessableContentError(Exception):
@@ -22,7 +50,7 @@ class SxapiUnprocessableContentError(Exception):
         self.message = message
 
     def __str__(self):
-        return self.message
+        return f"{self.__class__.__name__}:  {self.message}"
 
 
 class SxapiConfigurationFileError(Exception):
@@ -36,7 +64,7 @@ class SxapiConfigurationFileError(Exception):
         self.info = info
 
     def __str__(self):
-        return self.info + " -> " + self.parent_name + " -> " + self.message
+        return f"{self.info} -> {self.parent_name} -> {self.message}"
 
 
 class SxapiInvalidJsonError(Exception):
@@ -49,7 +77,7 @@ class SxapiInvalidJsonError(Exception):
         self.message = message
 
     def __str__(self):
-        return self.message
+        return f"{self.__class__.__name__}:  {self.message}"
 
 
 class SxapiFileNotFoundError(Exception):
@@ -62,4 +90,4 @@ class SxapiFileNotFoundError(Exception):
         self.message = message
 
     def __str__(self):
-        return self.message
+        return f"{self.__class__.__name__}:  {self.message}"

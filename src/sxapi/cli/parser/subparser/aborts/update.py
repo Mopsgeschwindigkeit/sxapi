@@ -1,6 +1,7 @@
 import argparse
 
 from sxapi.cli import cli_user
+from sxapi.errors import SxapiAuthorizationError
 
 DESCRIPTION = """
     Update abort for the given animal.
@@ -72,8 +73,7 @@ class SxApiAbortsUpdateSubparser:
     def _set_default_func(self):
         def animals_sub_function(args):
             if not cli_user.check_credentials_set():
-                print("No credentials set!")
-                return 1
+                raise SxapiAuthorizationError()
 
             res = cli_user.public_v2_api.animals.put_aborts(
                 animal_id=args.animal_id,

@@ -4,8 +4,10 @@ import sys
 
 from sxapi.cli import cli_user
 from sxapi.errors import (
+    SxapiAuthorizationError,
     SxapiFileNotFoundError,
     SxapiInvalidJsonError,
+    SxapiMissingOrgaIDError,
 )
 
 DESCRIPTION = """
@@ -87,8 +89,7 @@ class SxApiAnimalsUpdateSubparser:
     def _set_default_func(self):
         def animals_sub_function(args):
             if not cli_user.check_credentials_set():
-                print("No credentials set!")
-                return 1
+                raise SxapiAuthorizationError()
 
             organisation_id = cli_user.organisation_id
 
@@ -96,8 +97,7 @@ class SxApiAnimalsUpdateSubparser:
                 organisation_id = args.organisation_id
 
             if organisation_id is None:
-                print("No organisation_id set!")
-                return 1
+                raise SxapiMissingOrgaIDError()
 
             if args.update_dict.isatty():
                 raise SxapiFileNotFoundError()

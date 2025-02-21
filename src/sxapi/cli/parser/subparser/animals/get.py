@@ -1,6 +1,10 @@
 import json
 
 from sxapi.cli import cli_user
+from sxapi.errors import (
+    SxapiAuthorizationError,
+    SxapiMissingOrgaIDError,
+)
 
 DESCRIPTION = """
     Get animals from the smaXtec system.
@@ -80,8 +84,7 @@ class SxApiAnimalsGetSubparser:
     def _set_default_func(self):
         def animals_sub_function(args):
             if not cli_user.check_credentials_set():
-                print("No credentials set!")
-                return 1
+                raise SxapiAuthorizationError()
 
             organisation_id = cli_user.organisation_id
 
@@ -89,8 +92,7 @@ class SxApiAnimalsGetSubparser:
                 organisation_id = args.organisation_id
 
             if organisation_id is None:
-                print("No organisation_id set!")
-                return 1
+                raise SxapiMissingOrgaIDError()
 
             animals = []
 
@@ -122,6 +124,5 @@ class SxApiAnimalsGetSubparser:
                 animals = animals[: args.limit]
 
             print(json.dumps(animals))
-            return 0
 
         self._parser.set_defaults(func=animals_sub_function)

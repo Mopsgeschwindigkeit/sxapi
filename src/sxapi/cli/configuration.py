@@ -5,7 +5,10 @@ from os.path import (
     expanduser,
 )
 
-from sxapi.errors import SxapiConfigurationFileError
+from sxapi.errors import (
+    SxapiConfigurationFileError,
+    SxapiFileNotFoundError,
+)
 
 
 class Config:
@@ -45,6 +48,10 @@ class Config:
 
     def _read_config_from_file(self, config_file_path):
         if config_file_path:
+            if not os.path.isfile(config_file_path):
+                raise SxapiFileNotFoundError(
+                    f"Config file {config_file_path} does not exist."
+                )
             self._config_file_paths.append(config_file_path)
 
         parsable_files = []

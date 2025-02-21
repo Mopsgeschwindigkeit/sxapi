@@ -78,8 +78,10 @@ def test_config(keyring_mock, version_mock):
 
     # test override with env_vars
     os.environ["SXAPI_USER"] = "testenv@example.com"
+    os.path.abspath("")
     with mock.patch(
-        "sys.argv", ["sxapi", "--version", "-c", "./test-config_param.conf"]
+        "sys.argv",
+        ["sxapi", "--version", "-c", "./tests/cli_tests/test-config_param.conf"],
     ):
         with mock.patch("sxapi.cli.cli_user.init_user") as iu_mock:
             cli.run()
@@ -99,7 +101,14 @@ def test_init_user(api_mock, k_mock, version_mock):
     cli = CliTest()
     with mock.patch(
         "sys.argv",
-        ["sxapi", "--version", "-c", "test-config_param.conf", "-t", "atoken"],
+        [
+            "sxapi",
+            "--version",
+            "-c",
+            "./tests/cli_tests/test-config_param.conf",
+            "-t",
+            "atoken",
+        ],
     ):
         cli.run()
         assert cli_user.api_access_token == "atoken"
@@ -107,14 +116,18 @@ def test_init_user(api_mock, k_mock, version_mock):
         cli_user.public_v2_api = cli_user.integration_v2_api = None
 
     with mock.patch(
-        "sys.argv", ["sxapi", "--version", "-c", "test-config_param.conf", "-k"]
+        "sys.argv",
+        ["sxapi", "--version", "-c", "./tests/cli_tests/test-config_param.conf", "-k"],
     ):
         cli.run()
         assert cli_user.api_access_token == "keyring-token"
         assert cli_user.public_v2_api and cli_user.integration_v2_api
         cli_user.public_v2_api = cli_user.integration_v2_api = None
 
-    with mock.patch("sys.argv", ["sxapi", "--version", "-c", "test-config_param.conf"]):
+    with mock.patch(
+        "sys.argv",
+        ["sxapi", "--version", "-c", "./tests/cli_tests/test-config_param.conf"],
+    ):
         os.environ["SMAXTEC_API_ACCESS_TOKEN"] = "env_token"
         cli.run()
         assert cli_user.api_access_token == "env_token"
@@ -122,7 +135,10 @@ def test_init_user(api_mock, k_mock, version_mock):
         os.environ.pop("SMAXTEC_API_ACCESS_TOKEN")
         cli_user.public_v2_api = cli_user.integration_v2_api = None
 
-    with mock.patch("sys.argv", ["sxapi", "--version", "-c", "test-config_param.conf"]):
+    with mock.patch(
+        "sys.argv",
+        ["sxapi", "--version", "-c", "./tests/cli_tests/test-config_param.conf"],
+    ):
         cli.run()
         assert cli_user.api_access_token == "api-token"
         assert cli_user.public_v2_api and cli_user.integration_v2_api

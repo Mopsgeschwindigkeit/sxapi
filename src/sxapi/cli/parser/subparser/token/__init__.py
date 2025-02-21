@@ -3,6 +3,10 @@ import getpass
 import requests
 
 from sxapi.cli import cli_user
+from sxapi.errors import (
+    SxapiAuthorizationError,
+    SxapiCliArgumentError,
+)
 from sxapi.publicV2 import PublicAPIV2
 
 
@@ -19,15 +23,14 @@ def handle_print_token(args):
         print(f"\nKeyring: {keyring}\n\nEnvironment: {env}")
         return 0
     elif len(args.print_token) > 2:
-        print("Invalid number of arguments. Use --help for usage information.")
-        return 0
+        raise SxapiCliArgumentError(
+            "Invalid number of arguments. Use --help for usage information."
+        )
 
     if "e" != args.print_token and "k" != args.print_token:
-        print(
-            "Invalid arguments. Only use 'e' for environment, 'k' for keyring "
-            "or 'ek' for both."
+        raise SxapiCliArgumentError(
+            "Invalid arguments. Only use 'e' for environment, 'k' for keyring or 'ek' for both."
         )
-        return 1
 
     if "e" == args.print_token:
         print(f"\nEnvironment Token: {env}\n")
@@ -47,8 +50,6 @@ def handle_set_token(args):
     cli_user.set_token_keyring(token=token)
     print("Token is stored in keyring!")
 
-    return 0
-
 
 def handle_clear_token():
     """
@@ -58,8 +59,6 @@ def handle_clear_token():
     """
     cli_user.clear_token_keyring()
     print("Token was deleted from keyring!")
-
-    return 0
 
 
 def handle_new_token():
@@ -73,8 +72,7 @@ def handle_new_token():
     username = input("Username: ")
 
     if "@" not in username:
-        print("Username must be a email!")
-        return 1
+        raise SxapiCliArgumentError("Username must be a email!")
 
     pwd = getpass.getpass()
 
@@ -84,8 +82,7 @@ def handle_new_token():
         return 0
     except requests.HTTPError as e:
         if "401" in str(e) or "422" in str(e):
-            print("Username or Password is wrong!")
-            return 1
+            raise SxapiAuthorizationError("Username or Password is wrong!")
 
 
 class SxApiTokenSubparser:
@@ -166,11 +163,11 @@ class SxApiTokenSubparser:
             )
 
             if number_op > 1:
-                print(
+                print(number_op)
+                raise SxapiCliArgumentError(
                     "Invalid Combination! Please use just one out of these parameters "
                     "[--print_token, --set_keyring, --new_token, --clear_keyring]"
                 )
-                return 1
 
             if args.print_token:
                 return handle_print_token(args)
@@ -182,6 +179,5 @@ class SxApiTokenSubparser:
                 return handle_new_token()
 
             self._parser.print_help()
-            return 2
 
         self._parser.set_defaults(func=token_sub_function)
